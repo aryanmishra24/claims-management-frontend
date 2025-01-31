@@ -1,36 +1,40 @@
+<script setup>
+import { ref } from "vue";
+
+const policyId = ref("");
+const claimAmount = ref("");
+
+const submitForm = async () => {
+  const claimId = crypto.randomUUID(); // Generate unique claim ID
+  try {
+    const response = await fetch("http://localhost:3000/claims", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: claimId, // Use generated claim ID
+        policyId: policyId.value,
+        claimAmount: claimAmount.value,
+      }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      alert(`Claim submitted successfully! Claim ID: ${claimId}`);
+      policyId.value = "";
+      claimAmount.value = "";
+    } else {
+      alert("Error: " + data.error);
+    }
+  } catch (error) {
+    console.error("Request failed", error);
+  }
+};
+</script>
+
 <template>
-    <div>
-      <h2>Submit a Claim</h2>
-      <form @submit.prevent="submitForm">
-        <input v-model="claim.id" placeholder="ID" required />
-        <input v-model="claim.policyId" placeholder="Policy ID" required />
-        <input v-model="claim.claimAmount" type="number" placeholder="Amount" required />
-        <button type="submit">Submit Claim</button>
-      </form>
-      <p v-if="message">{{ message }}</p>
-    </div>
-  </template>
-  
-  <script>
-  import api from "../api";
-  
-  export default {
-    data() {
-      return {
-        claim: { id: "", policyId: "", claimAmount: "" },
-        message: "",
-      };
-    },
-    methods: {
-      async submitForm() {
-        try {
-          const response = await api.createClaim(this.claim);
-          this.message = response.data.message;
-        } catch (error) {
-          this.message = "Error: " + error.response.data.error;
-        }
-      },
-    },
-  };
-  </script>
-  
+  <form @submit.prevent="submitForm">
+    <input v-model="policyId" placeholder="Policy ID" required />
+    <input v-model="claimAmount" type="number" placeholder="Claim Amount" required />
+    <button type="submit">Submit Claim</button>
+  </form>
+</template>
