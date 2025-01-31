@@ -9,7 +9,10 @@ const submitForm = async () => {
   try {
     const response = await fetch("https://claims-management.mishraaryan350.workers.dev/claims", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+      "Content-Type": "application/json",
+      "x-api-key": "6f4f79cac51e76536abc47132fa51cc5f35d97375f70da3280779639d568ad6a" // Replace with your actual API key
+    },
       body: JSON.stringify({
         id: claimId, // Use generated claim ID
         policyId: policyId.value,

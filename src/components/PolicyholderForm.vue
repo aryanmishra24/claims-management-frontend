@@ -10,7 +10,7 @@ const submitForm = async () => {
   try {
     const response = await fetch("https://claims-management-1-ohry.onrender.com/policyholders", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-api-key": "6f4f79cac51e76536abc47132fa51cc5f35d97375f70da3280779639d568ad6a" },
       body: JSON.stringify({
         id: policyholderId,
         name: name.value,
