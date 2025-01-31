@@ -7,7 +7,7 @@ const claimAmount = ref("");
 const submitForm = async () => {
   const claimId = crypto.randomUUID(); // Generate unique claim ID
   try {
-    const response = await fetch("http://localhost:3000/claims", {
+    const response = await fetch("https://claims-management.mishraaryan350.workers.dev/claims", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -8,7 +8,7 @@ const submitForm = async () => {
   const policyId = crypto.randomUUID(); // Generate unique ID
 
   try {
-    const response = await fetch("http://localhost:3000/policies", {
+    const response = await fetch("https://claims-management.mishraaryan350.workers.dev/policies", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

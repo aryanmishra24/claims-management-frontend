@@ -8,14 +8,14 @@ const submitForm = async () => {
   const policyholderId = crypto.randomUUID(); // Generate unique ID
 
   try {
-    const response = await fetch("http://localhost:3000/policyholders", {
+    const response = await fetch("https://claims-management-1-ohry.onrender.com/policyholders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         id: policyholderId,
         name: name.value,
         contactInfo: contactInfo.value,
-      }),
+      })
     });
 
     const data = await response.json();
