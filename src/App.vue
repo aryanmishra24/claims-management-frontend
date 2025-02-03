@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { fetchPolicyholders, fetchPolicies, fetchClaims } from './fetch.js'; // Import fetch functions
+import { ref } from 'vue';
+import { fetchPolicyholders, fetchPolicies, fetchClaims } from './fetch.js';
 import ClaimForm from './components/ClaimForm.vue';
 import PolicyholderForm from './components/PolicyholderForm.vue';
 import PolicyForm from './components/PolicyForm.vue';
@@ -10,30 +10,33 @@ const policies = ref([]);
 const claims = ref([]);
 const loading = ref(false);
 const error = ref(null);
+const selectedDataType = ref('policyholders');
+const showList = ref(false);
 
-// Auto-fetch data when component mounts
-onMounted(async () => {
+const fetchSelectedData = async () => {
   try {
     loading.value = true;
     error.value = null;
+    showList.value = true;
 
-    // Fetch all data in parallel
-    const [holders, policiesData, claimsData] = await Promise.all([
-      fetchPolicyholders(),
-      fetchPolicies(),
-      fetchClaims(),
-    ]);
-
-    policyholders.value = holders;
-    policies.value = policiesData;
-    claims.value = claimsData;
+    switch(selectedDataType.value) {
+      case 'policyholders':
+        policyholders.value = await fetchPolicyholders();
+        break;
+      case 'policies':
+        policies.value = await fetchPolicies();
+        break;
+      case 'claims':
+        claims.value = await fetchClaims();
+        break;
+    }
   } catch (err) {
     error.value = err.message;
     console.error("Fetch error:", err);
   } finally {
     loading.value = false;
   }
-});
+};
 </script>
 
 <template>
@@ -47,14 +50,14 @@ onMounted(async () => {
 
   <main>
     <div class="actions">
-      <button @click="fetchPolicyholders" :disabled="loading">
-        {{ loading ? 'Refreshing...' : 'Refresh Policyholders' }}
-      </button>
-      <button @click="fetchPolicies" :disabled="loading">
-        {{ loading ? 'Refreshing...' : 'Refresh Policies' }}
-      </button>
-      <button @click="fetchClaims" :disabled="loading">
-        {{ loading ? 'Refreshing...' : 'Refresh Claims' }}
+      <select v-model="selectedDataType" @change="showList = false">
+        <option value="policyholders">Policyholders</option>
+        <option value="policies">Policies</option>
+        <option value="claims">Claims</option>
+      </select>
+      
+      <button @click="fetchSelectedData" :disabled="loading">
+        {{ loading ? 'Fetching...' : 'Fetch Data' }}
       </button>
     </div>
 
@@ -66,37 +69,48 @@ onMounted(async () => {
       Loading data...
     </div>
 
-    <div v-if="policyholders.length">
-      <h2>Policyholders ({{ policyholders.length }})</h2>
-      <ul>
-        <li v-for="holder in policyholders" :key="holder.id">
-          #{{ holder.id }} - {{ holder.name }} ({{ holder.contactInfo }})
-        </li>
-      </ul>
-    </div>
+    <div v-if="showList">
+      <div v-if="selectedDataType === 'policyholders' && policyholders.length">
+        <h2>Policyholders ({{ policyholders.length }})</h2>
+        <ul>
+          <li v-for="holder in policyholders" :key="holder.id">
+            #{{ holder.id }} - {{ holder.name }} ({{ holder.contactInfo }})
+          </li>
+        </ul>
+      </div>
 
-    <div v-if="policies.length">
-      <h2>Policies ({{ policies.length }})</h2>
-      <ul>
-        <li v-for="policy in policies" :key="policy.id">
-          Policy #{{ policy.id }} - ${{ policy.policyAmount }} (Holder: {{ policy.policyholderId }})
-        </li>
-      </ul>
-    </div>
+      <div v-if="selectedDataType === 'policies' && policies.length">
+        <h2>Policies ({{ policies.length }})</h2>
+        <ul>
+          <li v-for="policy in policies" :key="policy.id">
+            Policy #{{ policy.id }} - ${{ policy.policyAmount }} (Holder: {{ policy.policyholderId }})
+          </li>
+        </ul>
+      </div>
 
-    <div v-if="claims.length">
-      <h2>Claims ({{ claims.length }})</h2>
-      <ul>
-        <li v-for="claim in claims" :key="claim.id">
-          Claim #{{ claim.id }} - ${{ claim.amount }} (Policy: {{ claim.policyId }})
-        </li>
-      </ul>
+      <div v-if="selectedDataType === 'claims' && claims.length">
+        <h2>Claims ({{ claims.length }})</h2>
+        <ul>
+          <li v-for="claim in claims" :key="claim.id">
+            Claim #{{ claim.id }} - ${{ claim.amount }} (Policy: {{ claim.policyId }})
+          </li>
+        </ul>
+      </div>
     </div>
   </main>
 </template>
 
 <style scoped>
-/* Add these new styles */
+/* Add dropdown styles */
+select {
+  padding: 0.5rem 1rem;
+  margin-right: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  background-color: white;
+}
+
+/* Keep existing styles */
 .error-message {
   color: #dc3545;
   padding: 1rem;
@@ -110,7 +124,6 @@ onMounted(async () => {
   padding: 1rem;
 }
 
-/* Update existing styles */
 header {
   line-height: 1.5;
   padding-bottom: 2rem;
