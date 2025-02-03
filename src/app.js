@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = "https://your-backend-url.com"; // Replace with your Fastify backend URL
-const API_KEY = "your_api_key"; // Replace with your API key
+const API_BASE_URL = "https://claims-management.mishraaryan350.workers.dev/"; // Replace with your Fastify backend URL
+const API_KEY = "6f4f79cac51e76536abc47132fa51cc5f35d97375f70da3280779639d568ad6a"; // Replace with your API key
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
